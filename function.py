@@ -109,7 +109,7 @@ def tf(fichier):
     dictionnaire_tf = {}
     liste_mots = chaine.split()
     liste_mots_sans_doublon = list(set(liste_mots))
-    nombre_mots = len(liste_mots_sans_doublon)
+
 
 
     for word in liste_mots_sans_doublon:
@@ -121,14 +121,7 @@ def tf(fichier):
         dictionnaire_mot[cle] = valeur
 
 
-    for i in range(len(liste_mots_sans_doublon)):
-        cle = liste_mots[i]
-        valeur = liste_occurences[i]/nombre_mots
-        dictionnaire_tf[cle] = valeur
-
-
-
-    return dictionnaire_tf
+    return dictionnaire_mot
 
 
 noms_fichiers = list_of_files("speeches", "txt")
