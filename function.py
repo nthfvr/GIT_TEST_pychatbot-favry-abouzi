@@ -182,5 +182,54 @@ def IDF(repertoire):
     return score_idf
 
 
-IDF("cleaned\\")
-print(tf("cleaned/Nomination_Giscard dEstaing.txtcleaned.txt"))
+
+
+def TF_IDF():
+    matrice_tfidf=[]
+    # Récupération de la liste des noms de fichiers texte dans le répertoire
+    files_names = list_of_files("cleaned\\", "txt")
+    # Initialisation d'un ensemble pour stocker tous les mots uniques dans les documents
+    set_mots = set([])
+    # Initialisation du nombre total de documents
+    nb_doc = 0
+    # Boucle pour parcourir chaque fichier dans le répertoire
+    for names in files_names:
+        # Lecture du contenu du fichier
+        with open("cleaned\\" + names, "r", encoding="utf-8") as fichier_cleaned:
+            contenu = fichier_cleaned.read()
+            # Division du contenu en une liste de mots
+            liste_de_mots = contenu.split()
+            # Ajout de chaque mot à l'ensemble des mots uniques
+            for mots in liste_de_mots:
+                set_mots.add(mots)
+            # Incrémentation du nombre de documents
+            nb_doc += 1
+    set_IDF=IDF("cleaned\\")
+    for mot in set_mots :
+        liste_inter=[]
+        for names in files_names:
+            with open("cleaned\\" + names, "r", encoding="utf-8") as fichier_cleaned:
+                contenu = fichier_cleaned.read()
+                liste_de_mots = contenu.split()
+                set_mots_fichier=set(liste_de_mots)
+                set_tf = tf("cleaned\\" + names)
+
+                if mot in set_tf:
+                    tf_mot=set_tf[mot]
+                else :
+                    tf_mot=0
+
+                idf_mot=set_IDF[mot]
+                tf_idf_mot=tf_mot*idf_mot
+                liste_inter.append(tf_idf_mot)
+
+
+        matrice_tfidf.append(liste_inter)
+    print(matrice_tfidf)
+
+
+
+
+
+
+TF_IDF()
