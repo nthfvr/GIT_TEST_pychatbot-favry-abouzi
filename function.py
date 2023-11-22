@@ -100,13 +100,17 @@ def noms_presidents(noms_fichiers):
     dictionnaire_presidents = dict.fromkeys(set(liste_presidents))
     return liste_presidents,dictionnaire_presidents
 
-def occurence_mot(fichier):
+def tf(fichier):
 #Renvoie le nombre d'occurences de chaque mot dans un fichier
-
+    with open(fichier, 'r', encoding='utf-8') as file:
+        chaine = file.read()
     liste_occurences = []
     dictionnaire_mot = {}
-    liste_mots = chaine.split(" ")
+    dictionnaire_tf = {}
+    liste_mots = chaine.split()
     liste_mots_sans_doublon = list(set(liste_mots))
+    nombre_mots = len(liste_mots_sans_doublon)
+
 
     for word in liste_mots_sans_doublon:
         liste_occurences.append(liste_mots.count((word)))
@@ -116,7 +120,15 @@ def occurence_mot(fichier):
         valeur = liste_occurences[i]
         dictionnaire_mot[cle] = valeur
 
-    return dictionnaire_mot
+
+    for i in range(len(liste_mots_sans_doublon)):
+        cle = liste_mots[i]
+        valeur = liste_occurences[i]/nombre_mots
+        dictionnaire_tf[cle] = valeur
+
+
+
+    return dictionnaire_tf
 
 
 noms_fichiers = list_of_files("speeches", "txt")
@@ -178,3 +190,4 @@ def IDF(repertoire):
 
 
 IDF("cleaned\\")
+print(tf("cleaned/Nomination_Giscard dEstaing.txtcleaned.txt"))
