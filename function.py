@@ -80,6 +80,48 @@ def ponctuation():
                 texte_nettoye = ""
 
 
+def noms_presidents(noms_fichiers):
+    # Renvoie une liste des noms des présidents à partir des noms des fichiers.
+    liste_presidents = []
+
+    # Supprime les prefixes "Nomination_" et suffixes ".txt"  des noms des fichiers.
+    for i in range(len(noms_fichiers)):
+        noms_fichiers[i] = noms_fichiers[i].strip("Nomination_")
+        noms_fichiers[i] = noms_fichiers[i].strip(".txt")
+
+    # Supprime tous les caractères qui ne font pas partie de l'alphabet dans les noms des présidents.
+    for nom in noms_fichiers:
+        nouveau_nom = ""
+        for letter in nom:
+            if letter.isalpha():
+                nouveau_nom += letter
+        liste_presidents.append(nouveau_nom)
+
+    dictionnaire_presidents = dict.fromkeys(set(liste_presidents))
+    return liste_presidents,dictionnaire_presidents
+
+def occurence_mot(fichier):
+#Renvoie le nombre d'occurences de chaque mot dans un fichier
+
+    liste_occurences = []
+    dictionnaire_mot = {}
+    liste_mots = chaine.split(" ")
+    liste_mots_sans_doublon = list(set(liste_mots))
+
+    for word in liste_mots_sans_doublon:
+        liste_occurences.append(liste_mots.count((word)))
+
+    for i in range(len(liste_mots_sans_doublon)):
+        cle = liste_mots[i]
+        valeur = liste_occurences[i]
+        dictionnaire_mot[cle] = valeur
+
+    return dictionnaire_mot
+
+
+noms_fichiers = list_of_files("speeches", "txt")
+noms_presidents, dictionnaire_president = noms_presidents(noms_fichiers)
+
 # Appel des fonctions
 minuscule()
 ponctuation()
