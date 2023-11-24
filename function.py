@@ -233,8 +233,7 @@ def calculer_tfidf(repertoire):
 
 ## Fonctionalité à developper
 tfidf=(calculer_tfidf("cleaned\\"))
-print(tfidf[1]["des"])
-#tfidf[1]["testfonction"]=[0, 0, 0, 0, 0, 0, 0, 0]
+
 def mot_non_important(repertoire):
     files_names=list_of_files(repertoire, "txt")
     list_mot_0 = [k for (k, val) in tfidf[1].items() if val==[0 for i in range(len(files_names))]]
