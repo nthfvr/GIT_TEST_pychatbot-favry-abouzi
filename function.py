@@ -100,25 +100,19 @@ def noms_presidents(noms_fichiers):
     dictionnaire_presidents = dict.fromkeys(set(liste_presidents))
     return liste_presidents,dictionnaire_presidents
 
-def tf(fichier):
+def tf(chaine):
 #Renvoie le nombre d'occurences de chaque mot dans un fichier
-    with open(fichier, 'r', encoding='utf-8') as file:
-        chaine = file.read()
-    liste_occurences = []
+
     dictionnaire_mot = {}
-    dictionnaire_tf = {}
     liste_mots = chaine.split()
-    liste_mots_sans_doublon = list(set(liste_mots))
-
-
+    liste_mots_sans_doublon = set(liste_mots)
 
     for word in liste_mots_sans_doublon:
-        liste_occurences.append(liste_mots.count((word)))
-
-    for i in range(len(liste_mots_sans_doublon)):
-        cle = liste_mots[i]
-        valeur = liste_occurences[i]
-        dictionnaire_mot[cle] = valeur
+        valeur = 0
+        for mot_correspondant in liste_mots:
+            if word == mot_correspondant:
+                valeur += 1
+        dictionnaire_mot[word] = valeur
 
 
     return dictionnaire_mot
@@ -177,59 +171,72 @@ def IDF(repertoire):
     # Boucle pour chaque mot dans le dictionnaire d'occurrences
     for cle in dico_occurence_mot.keys():
         # Calcul du score IDF et stockage dans le dictionnaire
-        score_idf[cle] = math.log(nb_doc / dico_occurence_mot[cle], 10)
+        score_idf[cle] = math.log((nb_doc / dico_occurence_mot[cle])+1, 10)
     # Retourne le dictionnaire final des scores IDF pour chaque mot
     return score_idf
+IDF("cleaned\\")
 
 
 
 
-def TF_IDF():
-    matrice_tfidf=[]
-    # Récupération de la liste des noms de fichiers texte dans le répertoire
-    files_names = list_of_files("cleaned\\", "txt")
-    # Initialisation d'un ensemble pour stocker tous les mots uniques dans les documents
-    set_mots = set([])
-    # Initialisation du nombre total de documents
-    nb_doc = 0
-    # Boucle pour parcourir chaque fichier dans le répertoire
+
+
+def calculer_tfidf(repertoire):
+    files_names = list_of_files(repertoire, "txt")
+    set_mots = []
     for names in files_names:
-        # Lecture du contenu du fichier
+        with open(repertoire + names, "r", encoding="utf-8") as fichier_cleaned:
+            contenu = fichier_cleaned.read()
+            liste_de_mots = contenu.split()
+            for mots in liste_de_mots:
+                set_mots.append(mots)
+    set_mots=list(set(set_mots))
+
+
+    idf=IDF("cleaned\\")
+
+    matrice_tfidf = [[] for i in range(len(set_mots))]
+    i=0
+    for names in files_names:
+        i=0
+        mot_du_fichier = set([])
         with open("cleaned\\" + names, "r", encoding="utf-8") as fichier_cleaned:
             contenu = fichier_cleaned.read()
-            # Division du contenu en une liste de mots
+            tf_fichier = tf(contenu)
             liste_de_mots = contenu.split()
-            # Ajout de chaque mot à l'ensemble des mots uniques
             for mots in liste_de_mots:
-                set_mots.add(mots)
-            # Incrémentation du nombre de documents
-            nb_doc += 1
-    set_IDF=IDF("cleaned\\")
-    for mot in set_mots :
-        liste_inter=[]
-        for names in files_names:
-            with open("cleaned\\" + names, "r", encoding="utf-8") as fichier_cleaned:
-                contenu = fichier_cleaned.read()
-                liste_de_mots = contenu.split()
-                set_mots_fichier=set(liste_de_mots)
-                set_tf = tf("cleaned\\" + names)
-
-                if mot in set_tf:
-                    tf_mot=set_tf[mot]
+                mot_du_fichier.add(mots)
+            for mot in set_mots:
+                if mot in mot_du_fichier:
+                    tf_mot=tf_fichier[mot]
+                    idf_mot=idf[mot]
+                    matrice_tfidf[i].append(tf_mot*idf_mot)
                 else :
-                    tf_mot=0
-
-                idf_mot=set_IDF[mot]
-                tf_idf_mot=tf_mot*idf_mot
-                liste_inter.append(tf_idf_mot)
-
-
-        matrice_tfidf.append(liste_inter)
-    print(matrice_tfidf)
+                    matrice_tfidf[i].append(0)
+                i+=1
+    #creation dictionaire pour associer le mot a ses scores tf-idf
+    dico_matrice={}
+    for i in range(len(set_mots)):
+        dico_matrice[set_mots[i]]=matrice_tfidf[i]
 
 
 
 
 
+    return [(matrice_tfidf), dico_matrice]
 
-TF_IDF()
+
+
+
+
+
+
+## Fonctionalité à developper
+tfidf=(calculer_tfidf("cleaned\\"))
+print(tfidf[1]["des"])
+#tfidf[1]["testfonction"]=[0, 0, 0, 0, 0, 0, 0, 0]
+def mot_non_important(repertoire):
+    files_names=list_of_files(repertoire, "txt")
+    list_mot_0 = [k for (k, val) in tfidf[1].items() if val==[0 for i in range(len(files_names))]]
+    return (list_mot_0)
+print(mot_non_important("cleaned\\"))
