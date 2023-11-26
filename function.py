@@ -1,4 +1,5 @@
 import os
+import math
 def list_of_files(directory, extension):
 
     files_names = []
@@ -88,6 +89,7 @@ def noms_presidents(noms_fichiers):
     for i in range(len(noms_fichiers)):
         noms_fichiers[i] = noms_fichiers[i].strip("Nomination_")
         noms_fichiers[i] = noms_fichiers[i].strip(".txt")
+        noms_fichiers[i] = noms_fichiers[i].strip("cleanedtxt")
 
     # Supprime tous les caractères qui ne font pas partie de l'alphabet dans les noms des présidents.
     for nom in noms_fichiers:
@@ -119,13 +121,13 @@ def tf(chaine):
 
 
 noms_fichiers = list_of_files("speeches", "txt")
-noms_presidents, dictionnaire_president = noms_presidents(noms_fichiers)
+noms_presidentss, dictionnaire_president = noms_presidents(noms_fichiers)
 
 # Appel des fonctions
 minuscule()
 ponctuation()
 
-import math
+
 
 
 # Fonction qui calcule le score IDF pour chaque mot dans un répertoire de fichiers texte
@@ -238,4 +240,118 @@ def mot_non_important(repertoire):
     files_names=list_of_files(repertoire, "txt")
     list_mot_0 = [k for (k, val) in tfidf[1].items() if val==[0 for i in range(len(files_names))]]
     return (list_mot_0)
-print(mot_non_important("cleaned\\"))
+
+def mot_max_occurrences(mot):
+    # Liste des fichiers dans le répertoire cleaned
+    files_names = list_of_files("./speeches", ".txt")
+
+    # Initialisation des variables pour le fichier avec le plus grand nombre d'occurrences
+    fichier_max_occurrences = ""
+    max_occurrences = 0
+
+    # Liste pour stocker les fichiers contenants le mot de recherche
+    fichiers_avec_mot = []
+
+    for filename in files_names:
+        # Construire le chemin complet du fichier
+        chemin_fichier = os.path.join("./speeches", filename)
+
+        # Lire le contenu du fichier
+        with open(chemin_fichier, 'r', encoding='utf-8') as fichier:
+            contenu = fichier.read()
+
+            # Utiliser la fonction tf() pour obtenir le nombre d'occurrences du mot de recherche
+            occurrences_mot = tf(contenu).get(mot,0)
+
+
+            # Vérifier si le mot de recherche est présent dans le fichier
+            if occurrences_mot > 0:
+                fichiers_avec_mot.append(filename)
+
+            # Mettre à jour le fichier avec le plus grand nombre d'occurrences si nécessaire
+            if occurrences_mot > max_occurrences:
+                max_occurrences = occurrences_mot
+                fichier_max_occurrences = filename
+
+    return fichiers_avec_mot, fichier_max_occurrences
+
+
+
+
+def premier_president_ecologie_climat(directory, extension):
+    # Liste des fichiers dans le répertoire avec l'extension spécifiée
+    noms_fichier_local = list_of_files(directory, extension)
+
+    # Initialiser le nom du premier président à parler d'écologie ou de climat
+    premier_president_ecologie_climat = ""
+
+    for filename in noms_fichier_local:
+        liste_temp = []
+        # Construire le chemin complet du fichier
+        chemin_fichier = os.path.join(directory, filename)
+
+        # Lire le contenu du fichier
+        with open(chemin_fichier, 'r', encoding='utf-8') as fichier:
+            contenu_president = fichier.read()
+            #ajoute le nom du fichier à une liste pour pouvoir utiliser la fonction nom président dessus
+            liste_temp.append(filename)
+            # Vérifier si le fichier mentionne l'écologie ou le climat
+            if 'écologie' in contenu_president or 'climat' in contenu_president:
+                premier_president_ecologie_climat = noms_presidents(liste_temp)[0][0]
+                break  # Sortir de la boucle dès qu'un président est trouvé
+
+    return premier_president_ecologie_climat
+
+directory = "cleaned"
+extension = "txt"
+resultat = premier_president_ecologie_climat(directory, extension)
+
+if resultat:
+    print(f"Le premier président à parler d'écologie ou de climat est : {resultat}")
+else:
+    print("Aucun président ne mentionne l'écologie ou le climat.")
+
+
+
+
+
+def choix():
+    print("---------------------------------------------------------------------------------------------------------------------------")
+    print("Sélectionner une option :")
+    print("1 :Afficher la liste des mots les moins importants dans le corpus de documents")
+    print("2 :Afficher le(s) mot(s) ayant le score TD-IDF le plus élevé")
+    print("3 :Indiquer le(s) mot(s) le(s) plus répété(s) par le président Chirac")
+    print("4 :Indiquer le(s) nom(s) du (des) président(s) qui a (ont) parlé de la « Nation » et celui qui l’a répété le plus de fois")
+    print("5 :Indiquer le premier président à parler du climat et/ou de l’écologie")
+    print("6 :Hormis les mots dits « non importants », quel(s) est(sont) le(s) mot(s) que tous les présidents ont évoqués.")
+    print("---------------------------------------------------------------------------------------------------------------------------")
+    liste_choix = [str(i) for i in range(1,7)]
+    choix = None
+    while not choix in liste_choix:
+        choix = input("Quel est votre choix: ")
+    return choix
+
+def menu():
+    running = True
+    while running:
+        choix_utilisateur = choix()
+        match choix_utilisateur:
+            case "1":
+                print(mot_non_important("cleaned"))
+            case "1" :
+                pass
+            case "3":
+                pass
+            case "4":
+                pass
+            case "5":
+                resultat = premier_president_ecologie_climat("cleaned",".txt")
+                if resultat:
+                    print(f"Le premier président à parler d'écologie ou de climat est : {resultat}")
+                else:
+                    print("Aucun président ne mentionne l'écologie ou le climat.")
+
+            case other:
+                choix_utilisateur = choix()
+
+menu()
